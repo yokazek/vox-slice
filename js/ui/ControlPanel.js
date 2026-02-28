@@ -45,6 +45,7 @@ export default class ControlPanel {
         // リセット / タイトル
         this.btnReset = document.getElementById('btn-reset');
         this.appTitle = document.getElementById('app-title');
+        this.btnThemeToggle = document.getElementById('btn-theme-toggle');
 
         // 外部に通知するイベントコールバック群
         this.onFileSelected = null;       // (file)
@@ -61,6 +62,7 @@ export default class ControlPanel {
         this.onLoadProjectFile = null;    // (file)
         this.onPrevRegionRequest = null;  // ()
         this.onNextRegionRequest = null;  // ()
+        this.onThemeToggle = null;        // (theme)
 
         this._setupEvents();
     }
@@ -186,6 +188,19 @@ export default class ControlPanel {
         }
         if (this.appTitle) {
             this.appTitle.addEventListener('click', handleReload);
+        }
+
+        // --- 5. テーマ切り替え ---
+        if (this.btnThemeToggle) {
+            this.btnThemeToggle.addEventListener('click', () => {
+                const isLight = document.documentElement.classList.toggle('light-theme');
+                const newTheme = isLight ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+
+                if (this.onThemeToggle) {
+                    this.onThemeToggle(newTheme);
+                }
+            });
         }
 
         // --- 4. キーボードショートカット ---

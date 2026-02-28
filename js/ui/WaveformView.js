@@ -28,8 +28,10 @@ export default class WaveformView {
         this.loadingOverlay = document.getElementById('waveform-loading');
         this.tooltip = document.getElementById('time-tooltip');
 
-        this.wsRegions = null; // RegionsPluginのインスタンス
+        this.wsRegions = null; // RegionsPlugin of instance
         this._isUpdatingInternally = false;
+        this._lastSlicePoints = [];
+        this._lastRegions = [];
 
         this._initWaveSurfer();
         this._setupEvents();
@@ -389,6 +391,8 @@ export default class WaveformView {
         if (!this.wavesurfer || this.wavesurfer.getDuration() === 0) return;
 
         this._isUpdatingInternally = true;
+        this._lastSlicePoints = slicePoints;
+        this._lastRegions = regions;
         this._regionsData = regions;
 
         const rootStyle = getComputedStyle(document.documentElement);
@@ -467,7 +471,7 @@ export default class WaveformView {
                     inactiveLayer.style.pointerEvents = 'none';
 
                     // CSSのbackdrop-filterを活用して、背後にある波形の色をグレーにして暗くする（視認性を確保）
-                    inactiveLayer.style.backgroundColor = 'rgba(15, 23, 42, 0.4)';
+                    inactiveLayer.style.backgroundColor = rootStyle.getPropertyValue('--clr-region-inactive').trim() || 'rgba(15, 23, 42, 0.4)';
                     inactiveLayer.style.backdropFilter = 'grayscale(100%) brightness(0.6)';
                     wsRegion.element.appendChild(inactiveLayer);
                 }
@@ -543,5 +547,28 @@ export default class WaveformView {
         if (this.wavesurfer) {
             this.wavesurfer.setVolume(volume);
         }
+    }
+
+    /**
+     * テーマ変更時に波形の各色を再取得して適用する
+     */
+    refreshColors() {
+        if (!this.wavesurfer) return;
+
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+
+        const waveColor = style.getPropertyValue('--clr-wave').trim() || '#f59e0b';
+        const progressColor = style.getPropertyValue('--clr-progress').trim() || '#f59e0b';
+        const cursorColor = style.getPropertyValue('--clr-secondary').trim() || '#f59e0b';
+
+        this.wavesurfer.setOptions({
+            waveColor,
+            progressColor,
+            cursorColor
+        });
+
+        // 既存のRegionの描画を更新
+        this.updateSlicesAndSegments(this._lastSlicePoints, this._lastRegions);
     }
 }

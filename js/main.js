@@ -156,6 +156,10 @@ class App {
         this.controlPanel.onSaveProjectClick = () => this._handleSaveProject();
         this.controlPanel.onLoadProjectFile = (file) => this._handleLoadProject(file);
 
+        this.controlPanel.onThemeToggle = () => {
+            this.waveformView.refreshColors();
+        };
+
         this.controlPanel.onDownloadClick = async (format) => {
             const activeSegments = this.editorUseCase.getActiveRegions();
             if (activeSegments.length === 0) {

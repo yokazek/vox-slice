@@ -67,6 +67,35 @@
     --transition-base: 0.25s ease;
 }
 
+/* Light Theme Overrides */
+.light-theme {
+    --clr-bg-base: #f1f5f9;
+    /* Slate 100 */
+    --clr-bg-card: #ffffff;
+    --clr-bg-hover: #e2e8f0;
+    /* Slate 200 */
+
+    --clr-text-main: #0f172a;
+    /* Slate 900 */
+    --clr-text-muted: #64748b;
+    /* Slate 500 */
+
+    --clr-border: #cbd5e1;
+    /* Slate 300 */
+
+    --clr-primary: #3b82f6;
+    --clr-primary-hover: #2563eb;
+    --clr-secondary: #60a5fa;
+    --clr-secondary-hover: #3b82f6;
+    --clr-slice-line: #FBBC04;
+
+    /* Wavesurfer Colors */
+    --clr-surface: #ffffff;
+    --clr-wave: #3b82f6;
+    --clr-progress: #2563eb;
+    --clr-region-inactive: rgba(226, 232, 240, 0.7);
+}
+
 /* ==========================================================================
    Reset & Base Styles
    ========================================================================== */
@@ -103,6 +132,7 @@ body {
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
     height: 100vh;
+    transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 h1,
@@ -193,6 +223,43 @@ h6 {
     transform: scale(1.1);
 }
 
+/* Theme Toggle Button */
+.btn-theme-toggle {
+    background: transparent;
+    border: 1px solid var(--clr-border);
+    color: var(--clr-primary);
+    padding: 0.5rem;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.btn-theme-toggle:hover {
+    background: var(--clr-bg-hover);
+    transform: scale(1.05);
+}
+
+.btn-theme-toggle .sun-icon {
+    display: none;
+}
+
+.btn-theme-toggle .moon-icon {
+    display: block;
+}
+
+.light-theme .btn-theme-toggle .sun-icon {
+    display: block;
+}
+
+.light-theme .btn-theme-toggle .moon-icon {
+    display: none;
+}
+
 .header-right {
     display: flex;
     align-items: center;
@@ -228,7 +295,8 @@ h6 {
 .app-footer {
     padding: 0.75rem 1.5rem;
     border-top: 1px solid var(--clr-border);
-    background: rgba(15, 23, 42, 0.8);
+    background: var(--clr-bg-base);
+    opacity: 0.9;
     backdrop-filter: blur(8px);
     margin-top: auto;
 }
@@ -1018,7 +1086,8 @@ h6 {
 }
 
 .regions-table tr:hover {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: var(--clr-bg-hover);
+    opacity: 0.9;
 }
 
 .regions-table tr.inactive {
@@ -1058,7 +1127,8 @@ h6 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(15, 23, 42, 0.8);
+    background-color: var(--clr-bg-base);
+    opacity: 0.8;
     backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
@@ -1079,7 +1149,7 @@ h6 {
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(255, 255, 255, 0.1);
+    border: 3px solid var(--clr-border);
     border-radius: 50%;
     border-top-color: var(--clr-primary);
     animation: spin 1s ease-in-out infinite;
