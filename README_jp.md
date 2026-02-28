@@ -2,6 +2,9 @@
 
 [English](README.md)
 
+**Live demo: [https://yokazek.github.io/vox-slice/](https://yokazek.github.io/vox-slice/)**
+
+
 **ブラウザで完結する、高精度な音声スライス体験。**
 
 VoxSliceは、WAVやMP3ファイルを直感的に分割できる高速なウェブツールです。波形エディターと無音自動検出により、インストール不要で精密なスライスと一括書き出しが可能です。

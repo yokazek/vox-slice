@@ -2,6 +2,9 @@
 
 [Japanese (日本語)](README_jp.md)
 
+**Live demo: [https://yokazek.github.io/vox-slice/](https://yokazek.github.io/vox-slice/)**
+
+
 **Precision audio slicing, right in your browser.**
 
 VoxSlice is a fast, web-based tool designed to effortlessly split WAV and MP3 files. With its intuitive waveform editor and automatic silence detection, you can slice audio with precision and export segments instantly—no installation required.
