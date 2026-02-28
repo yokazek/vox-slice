@@ -514,11 +514,21 @@ export default class WaveformView {
      * @param {number} index
      */
     playRegion(index) {
-        if (!this.wsRegions) return;
+        if (!this.wsRegions || !this.wavesurfer) return;
         const regions = this.wsRegions.getRegions();
         const targetId = `region_${index}`;
         const target = regions.find(r => r.id === targetId);
+
         if (target) {
+            // もし既にこの区間を再生中なら、トグル動作として一時停止する
+            if (this.wavesurfer.isPlaying() && this._activeRegionId === targetId) {
+                this.wavesurfer.pause();
+                // 停止時は区間再生状態をリセットする
+                this._playRegionEnd = null;
+                this._activeRegionId = null;
+                return;
+            }
+
             // 自動停止（またはループ）用の設定をセット
             this._playRegionEnd = target.end;
             this._activeRegionId = targetId;
