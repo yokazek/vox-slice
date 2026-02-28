@@ -12,6 +12,7 @@ export default class SegmentListView {
         this.onToggleActive = null; // (segmentIndex)
         this.onAddSplit = null;     // (timeSec)
         this.onRemoveSegment = null; // (segmentIndex)
+        this.onPlayRegion = null;    // (segmentIndex)
 
         this.btnAddSplit = this.container.querySelector('#btn-add-split');
         this.inputSplitTime = this.container.querySelector('#input-split-time');
@@ -89,7 +90,8 @@ export default class SegmentListView {
                 </span>
             </td>
             <td>
-                <button class="btn btn-danger btn-sm delete-btn" style="padding: 2px 8px; font-size: 0.75rem; background-color: var(--clr-danger, #ef4444); color: white; border: none; border-radius: 4px; cursor: pointer;">区切り削除</button>
+                <button class="btn btn-secondary btn-sm play-btn" title="この区間だけを再生します" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; margin-right: 4px;">▶ 再生</button>
+                <button class="btn btn-danger btn-sm delete-btn" title="直前の区切り線を削除して結合します" style="padding: 2px 8px; font-size: 0.75rem; background-color: var(--clr-danger, #ef4444); color: white; border: none; border-radius: 4px; cursor: pointer;">削 除</button>
             </td>
         `;
 
@@ -125,6 +127,14 @@ export default class SegmentListView {
         statusBadge.addEventListener('click', () => {
             if (this.onToggleActive) {
                 this.onToggleActive(segment.index);
+            }
+        });
+
+        // 再生ボタンのクリック時
+        const playBtn = tr.querySelector('.play-btn');
+        playBtn.addEventListener('click', () => {
+            if (this.onPlayRegion) {
+                this.onPlayRegion(segment.index);
             }
         });
 

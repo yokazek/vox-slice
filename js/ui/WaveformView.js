@@ -19,6 +19,9 @@ export default class WaveformView {
         this.onSliceLineMoved = null;
         this.onSegmentRightClicked = null;
 
+        // 特定区間のみを再生している時の終了時間（null時は無効）
+        this._playRegionEnd = null;
+
         // UI要素
         this.loadingOverlay = document.getElementById('waveform-loading');
         this.tooltip = document.getElementById('time-tooltip');
@@ -105,6 +108,18 @@ export default class WaveformView {
 
         this.wavesurfer.on('timeupdate', (currentTime) => {
             if (this.onTimeUpdate) this.onTimeUpdate(currentTime);
+
+            // 特定の区間を再生中であり、終了時間を超えたら一時停止する
+            if (this._playRegionEnd !== null && currentTime >= this._playRegionEnd) {
+                // 重複実行を防ぐため先にnullクリアしてからpauseを呼ぶ
+                this._playRegionEnd = null;
+                this.wavesurfer.pause();
+            }
+        });
+
+        // ユーザーの手動シーク操作（波形のクリックやドラッグ）が行われたら区間再生状態を解除
+        this.wavesurfer.on('interaction', () => {
+            this._playRegionEnd = null;
         });
 
         this.wavesurfer.on('error', (err) => {
@@ -355,6 +370,21 @@ export default class WaveformView {
             this.loadingOverlay.classList.remove('hidden');
         } else {
             this.loadingOverlay.classList.add('hidden');
+        }
+    }
+
+    /**
+     * 指定されたインデックスのRegion（区間）だけを再生する
+     * @param {number} index
+     */
+    playRegion(index) {
+        if (!this.wsRegions) return;
+        const regions = this.wsRegions.getRegions();
+        const target = regions.find(r => r.id === `region_${index}`);
+        if (target) {
+            // 自動停止用の終了時刻をセット
+            this._playRegionEnd = target.end;
+            target.play();
         }
     }
 }

@@ -242,6 +242,10 @@ class App {
                 this.editorUseCase.removeSlicePoint(index - 1);
             }
         };
+
+        this.segmentListView.onPlayRegion = (index) => {
+            this.waveformView.playRegion(index);
+        };
     }
 
     _updateDownloadButtonState() {
