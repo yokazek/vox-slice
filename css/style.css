@@ -248,6 +248,75 @@ h6 {
 }
 
 /* ==========================================================================
+   Legend / Tooltips
+   ========================================================================== */
+.legend-container {
+    position: relative;
+    display: inline-block;
+}
+
+.legend-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--clr-text-muted);
+    background: transparent;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--clr-border);
+    cursor: pointer;
+}
+
+.legend-toggle:hover {
+    color: var(--clr-text-main);
+    background: var(--clr-bg-hover);
+}
+
+.legend-tooltip {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    width: max-content;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.legend-container:hover .legend-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.legend-tooltip ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.legend-tooltip li {
+    font-size: 0.85rem;
+    color: var(--clr-text-muted);
+}
+
+.legend-tooltip li b {
+    color: var(--clr-text-main);
+    display: inline-block;
+    width: 130px;
+    /* 見出しの幅を揃える */
+}
+
+/* ==========================================================================
    Sections
    ========================================================================== */
 

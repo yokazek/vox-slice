@@ -37,7 +37,31 @@
             <!-- ワークスペース (ファイルアップロード後に表示) -->
             <section id="workspace" class="card hidden">
                 <div class="workspace-header">
-                    <h2 id="file-name-display">ファイル名未設定</h2>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <h2 id="file-name-display">ファイル名未設定</h2>
+                        <div class="legend-container">
+                            <button class="btn btn-icon legend-toggle" title="操作のヒント">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <span>操作方法</span>
+                            </button>
+                            <div class="legend-tooltip">
+                                <ul>
+                                    <li><b>スペースキー:</b> 再生 / 一時停止</li>
+                                    <li><b>Enterキー:</b> シークバーの位置で区切る</li>
+                                    <li><b>ダブルクリック:</b> 波形上で直接区切り線を追加</li>
+                                    <li><b>線を枠外へドラッグ:</b> 区切り線の削除</li>
+                                    <li><b>右クリック:</b> 区間の有効 / 除外を切り替え</li>
+                                    <li><b>ホイール回転:</b> 波形のズーム拡大 / 縮小</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                     <div class="time-display">
                         <span id="current-time">00:00.000</span> / <span id="total-time">00:00.000</span>
                     </div>
