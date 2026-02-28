@@ -21,6 +21,8 @@ export default class WaveformView {
 
         // 特定区間のみを再生している時の終了時間（null時は無効）
         this._playRegionEnd = null;
+        this._isLooping = false;
+        this._activeRegionId = null;
 
         // UI要素
         this.loadingOverlay = document.getElementById('waveform-loading');
@@ -109,17 +111,33 @@ export default class WaveformView {
         this.wavesurfer.on('timeupdate', (currentTime) => {
             if (this.onTimeUpdate) this.onTimeUpdate(currentTime);
 
-            // 特定の区間を再生中であり、終了時間を超えたら一時停止する
+            // 特定の区間を再生中であり、終了時間を超えたら
             if (this._playRegionEnd !== null && currentTime >= this._playRegionEnd) {
-                // 重複実行を防ぐため先にnullクリアしてからpauseを呼ぶ
-                this._playRegionEnd = null;
-                this.wavesurfer.pause();
+                if (this._isLooping && this._activeRegionId && this.wsRegions) {
+                    // ループモードがオンなら、再度開始位置に戻して再生を続ける
+                    const regions = this.wsRegions.getRegions();
+                    const target = regions.find(r => r.id === this._activeRegionId);
+                    if (target) {
+                        target.play(); // regionsPlugin.play() が開始位置へのシークと再生を行う
+                    }
+                } else {
+                    // ループオフなら一時停止
+                    this._playRegionEnd = null;
+                    this._activeRegionId = null;
+                    this.wavesurfer.pause();
+                }
             }
+        });
+
+        // ユーザーの手動停止やシークが行われたら区間再生状態を解除
+        this.wavesurfer.on('pause', () => {
+            // ループによる意図的なシーク(play/pauseの切り替わり等)もあるため、ここはinteractionのみに寄せる方が安全
         });
 
         // ユーザーの手動シーク操作（波形のクリックやドラッグ）が行われたら区間再生状態を解除
         this.wavesurfer.on('interaction', () => {
             this._playRegionEnd = null;
+            this._activeRegionId = null;
         });
 
         this.wavesurfer.on('error', (err) => {
@@ -374,16 +392,26 @@ export default class WaveformView {
     }
 
     /**
+     * ループモードの切り替え
+     * @param {boolean} isLooping 
+     */
+    setLoopMode(isLooping) {
+        this._isLooping = isLooping;
+    }
+
+    /**
      * 指定されたインデックスのRegion（区間）だけを再生する
      * @param {number} index
      */
     playRegion(index) {
         if (!this.wsRegions) return;
         const regions = this.wsRegions.getRegions();
-        const target = regions.find(r => r.id === `region_${index}`);
+        const targetId = `region_${index}`;
+        const target = regions.find(r => r.id === targetId);
         if (target) {
-            // 自動停止用の終了時刻をセット
+            // 自動停止（またはループ）用の設定をセット
             this._playRegionEnd = target.end;
+            this._activeRegionId = targetId;
             target.play();
         }
     }

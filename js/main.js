@@ -64,12 +64,15 @@ class App {
 
         this.controlPanel.onPlayPauseClick = () => {
             if (!this.waveformView.wavesurfer) return;
+            this.waveformView.wavesurfer.playPause();
+        };
 
-            if (this.isPlaying) {
-                this.waveformView.wavesurfer.pause();
-            } else {
-                this.waveformView.wavesurfer.play();
-            }
+        this.controlPanel.onLoopToggleClick = (isLooping) => {
+            this.waveformView.setLoopMode(isLooping);
+            // グローバルな再生時のループ処理（wavesurfer本体）にも反映させたい場合は以下を有効化
+            // if (this.waveformView.wavesurfer) {
+            //     this.waveformView.wavesurfer.setOptions({ loop: isLooping });
+            // }
         };
 
         this.controlPanel.onSplitClick = () => {

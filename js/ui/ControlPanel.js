@@ -17,6 +17,7 @@ export default class ControlPanel {
         this.iconPause = this.btnPlayPause.querySelector('.icon-pause');
         this.currentTimeDisplay = document.getElementById('current-time');
         this.totalTimeDisplay = document.getElementById('total-time');
+        this.btnLoopToggle = document.getElementById('btn-loop-toggle');
 
         // アクション関連
         this.btnSplit = document.getElementById('btn-split');
@@ -36,6 +37,7 @@ export default class ControlPanel {
         // 外部に通知するイベントコールバック群
         this.onFileSelected = null;       // (file)
         this.onPlayPauseClick = null;     // ()
+        this.onLoopToggleClick = null;    // (isLooping)
         this.onSplitClick = null;         // ()
         this.onAutoSilenceClick = null;   // (thresholdDb, duration)
         this.onDownloadClick = null;      // (format)
@@ -83,6 +85,20 @@ export default class ControlPanel {
         // --- 2. プレイヤーコントロール関連 ---
         this.btnPlayPause.addEventListener('click', () => {
             if (this.onPlayPauseClick) this.onPlayPauseClick();
+        });
+
+        // ループボタンの実装
+        this.isLooping = false;
+        this.btnLoopToggle.addEventListener('click', () => {
+            this.isLooping = !this.isLooping;
+            if (this.isLooping) {
+                this.btnLoopToggle.style.color = 'var(--clr-primary)'; // ハイライトする
+            } else {
+                this.btnLoopToggle.style.color = 'var(--clr-text-muted)';
+            }
+            if (this.onLoopToggleClick) {
+                this.onLoopToggleClick(this.isLooping);
+            }
         });
 
         this.btnSplit.addEventListener('click', () => {
