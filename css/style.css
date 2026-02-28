@@ -1,0 +1,579 @@
+/* ==========================================================================
+   CSS Variables (Design System)
+   ========================================================================== */
+:root {
+    /* Colors */
+    --clr-bg-base: #0f172a;
+    /* Slate 900 */
+    --clr-bg-card: #1e293b;
+    /* Slate 800 */
+    --clr-bg-hover: #334155;
+    /* Slate 700 */
+
+    --clr-text-main: #f8fafc;
+    /* Slate 50 */
+    --clr-text-muted: #94a3b8;
+    /* Slate 400 */
+
+    --clr-primary: #FBBC04;
+    /* Custom Yellow */
+    --clr-primary-hover: #E3A903;
+    /* Darker Yellow */
+
+    --clr-secondary: #f59e0b;
+    /* Amber 500 */
+    --clr-secondary-hover: #d97706;
+    /* Amber 600 */
+
+    --clr-danger: #ef4444;
+    /* Red 500 */
+    --clr-success: #10b981;
+    /* Emerald 500 */
+    --clr-warning: #eab308;
+    /* Yellow 500 */
+
+    --clr-border: #334155;
+    /* Slate 700 */
+
+    /* Wavesurfer Colors */
+    --clr-surface: #1e293b;
+    --clr-wave: #f59e0b;
+    /* Amber 200 - Warm wave matching primary */
+    --clr-progress: #f59e0b;
+    /* Custom Yellow progress */
+    --clr-slice-line: #3b82f6;
+    /* Blue slice lines for contrast */
+    --clr-region-inactive: rgba(15, 23, 42, 0.7);
+    /* Darker slate for inactive regions */
+    --clr-region-active: transparent;
+    /* Transparent for active regions */
+
+    /* Typography */
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Shadows & Effects */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+    /* Radii */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.25s ease;
+}
+
+/* ==========================================================================
+   Reset & Base Styles
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--clr-bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--clr-secondary);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--clr-primary);
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--clr-bg-base);
+    color: var(--clr-text-main);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+.app-container {
+    width: 100%;
+    margin: 0;
+    padding: 1rem;
+    height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+.app-header {
+    text-align: center;
+    background: linear-gradient(135deg, var(--clr-primary), var(--clr-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--clr-border);
+}
+
+.app-header p {
+    color: var(--clr-text-muted);
+    -webkit-text-fill-color: var(--clr-text-muted);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+.card {
+    background-color: transparent;
+    border: none;
+    padding: 1rem 0;
+    box-shadow: none;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    outline: none;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--clr-primary);
+    color: white;
+}
+
+.btn-primary:not(:disabled):hover {
+    background-color: var(--clr-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(251, 188, 4, 0.4);
+}
+
+.btn-secondary {
+    background-color: var(--clr-secondary);
+    color: white;
+}
+
+.btn-secondary:not(:disabled):hover {
+    background-color: var(--clr-secondary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.btn-icon {
+    padding: 0.75rem;
+    background-color: var(--clr-bg-hover);
+    color: var(--clr-text-main);
+    border-radius: var(--radius-full);
+}
+
+.btn-icon:hover {
+    background-color: var(--clr-border);
+    color: var(--clr-primary);
+}
+
+/* Inputs */
+.select-input,
+.number-input {
+    background-color: var(--clr-bg-base);
+    color: var(--clr-text-main);
+    border: 1px solid var(--clr-border);
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-family: monospace;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.select-input:focus,
+.number-input:focus {
+    border-color: var(--clr-primary);
+}
+
+.number-input {
+    width: 100px;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+/* Drop Zone */
+.drop-zone {
+    border: 2px dashed var(--clr-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: var(--clr-primary);
+    background-color: rgba(251, 188, 4, 0.05);
+}
+
+.drop-zone-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    pointer-events: none;
+}
+
+.drop-zone-content svg {
+    color: var(--clr-primary);
+    margin-bottom: 0.5rem;
+}
+
+.drop-zone-content p {
+    color: var(--clr-text-muted);
+}
+
+.drop-zone button {
+    pointer-events: auto;
+    margin-top: 1rem;
+}
+
+/* Workspace */
+.workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0 1rem;
+}
+
+.workspace-header h2 {
+    font-size: 1.25rem;
+    color: var(--clr-primary);
+}
+
+.time-display {
+    font-family: monospace;
+    font-size: 1.1rem;
+    color: var(--clr-text-muted);
+    background-color: var(--clr-bg-base);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--clr-border);
+}
+
+#current-time {
+    color: var(--clr-text-main);
+}
+
+/* Waveform Area */
+.waveform-container {
+    position: relative;
+    background-color: var(--clr-bg-card);
+    /* Change to card bg to distinguish from main bg slightly */
+    border-top: 1px solid var(--clr-border);
+    border-bottom: 1px solid var(--clr-border);
+    padding: 30px 0 10px 0;
+    /* More padding for handles */
+    margin-bottom: 1rem;
+    min-height: 150px;
+    width: 100%;
+}
+
+#waveform {
+    width: 100%;
+}
+
+/* Tooltip on hover */
+#time-tooltip {
+    position: absolute;
+    top: 5px;
+    /* Fixed at the top of the container */
+    background-color: var(--clr-primary);
+    color: var(--clr-bg-base);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-family: monospace;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+    font-weight: bold;
+    transform: translateX(-50%);
+    /* Center on the left property */
+}
+
+/* Custom Slice Line & Overlays */
+.custom-slice-layer {
+    pointer-events: none;
+}
+
+.custom-slice-line {
+    /* Base styles set via inline CSS, hover effects here */
+    transition: background-color 0.2s;
+    z-index: 10;
+}
+
+.custom-slice-line:hover,
+.custom-slice-line:hover .custom-slice-handle {
+    background-color: #fca5a5 !important;
+}
+
+.custom-slice-handle {
+    transition: background-color 0.2s, transform 0.1s;
+    z-index: 11;
+}
+
+.custom-slice-handle:hover {
+    transform: translateX(-50%) scale(1.2) !important;
+}
+
+/* We don't use the custom overlay css anymore, but keeping for reference if needed,
+   RegionsPlugin now styles these. But we can define CSS rules for the inline elements
+   if we wanted to target regions specifically */
+
+/* Control Panel */
+.controls-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background-color: transparent;
+    padding: 0.5rem 1rem;
+    border: none;
+}
+
+.controls-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.format-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--clr-text-muted);
+}
+
+/* Regions Table */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    padding: 0 1rem;
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: var(--clr-text-muted);
+}
+
+#workspace {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#regions-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
+    padding: 0 1rem;
+}
+
+.regions-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.regions-table th,
+.regions-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--clr-border);
+}
+
+.regions-table th {
+    color: var(--clr-text-muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+    background-color: var(--clr-bg-base);
+    /* Changed to solid for sticky */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.regions-table tr {
+    transition: background-color var(--transition-fast);
+}
+
+.regions-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.regions-table tr.inactive {
+    opacity: 0.5;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.status-active {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: var(--clr-success);
+}
+
+.status-inactive {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--clr-danger);
+}
+
+/* Overlays (Loading/Processing) */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: inherit;
+}
+
+.processing-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 80%;
+    max-width: 400px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--clr-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--clr-bg-hover);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--clr-primary);
+    transition: width 0.2s ease;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+    .controls-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .controls-group {
+        justify-content: space-between;
+    }
+
+    .export-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .export-controls>* {
+        width: 100%;
+        justify-content: center;
+    }
+}
