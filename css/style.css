@@ -164,6 +164,38 @@ h6 {
 .header-left {
     display: flex;
     align-items: center;
+    gap: 1.25rem;
+}
+
+#app-title {
+    cursor: pointer;
+    user-select: none;
+}
+
+.btn-reset {
+    color: var(--clr-danger);
+    border: 1px solid var(--clr-border);
+    background: transparent;
+    margin-left: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-reset:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--clr-danger);
+    transform: scale(1.1);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
     gap: 1.5rem;
 }
 
@@ -350,11 +382,155 @@ h6 {
     padding: 0.35rem;
 }
 
-.btn-icon-action {
-    padding: 0.5rem;
-    background: transparent;
-    border: none;
-    color: var(--clr-primary);
+/* Layout Utilities */
+.flex-center {
+    display: flex;
+    align-items: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+
+.gap-xs {
+    gap: 0.25rem;
+}
+
+.gap-sm {
+    gap: 0.5rem;
+}
+
+.gap-md {
+    gap: 0.75rem;
+}
+
+.gap-lg {
+    gap: 1rem;
+}
+
+/* Dashboard Controls */
+.controls-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--clr-bg-card);
+    border-top: 1px solid var(--clr-border);
+}
+
+.controls-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-right: 0.75rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 2px;
+    background: var(--clr-bg-base);
+    padding: 2px;
+    border-radius: 8px;
+    border: 1px solid var(--clr-border);
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background: var(--clr-border);
+    margin: 0 0.5rem;
+}
+
+.auto-silence-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+    background: var(--clr-bg-base);
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--clr-border);
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    cursor: pointer;
+    width: 140px;
+}
+
+.numeric-input-sm {
+    width: 80px;
+    font-size: 1rem;
+    border-bottom-width: 2px;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.btn-download-primary {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(251, 188, 4, 0.1);
+    border: 1px solid var(--clr-primary);
+}
+
+.btn-download-primary:not(:disabled):hover {
+    background: var(--clr-primary);
+    color: var(--clr-bg-base);
+}
+
+/* List Actions Bar */
+.list-actions {
+    margin: 1rem 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--clr-bg-card);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--clr-border);
+}
+
+.format-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.project-actions {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
 }
 
 .btn-icon-action.no-bg {
