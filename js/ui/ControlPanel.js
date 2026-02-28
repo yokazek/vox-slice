@@ -1,5 +1,5 @@
 /**
- * ControlPanel
+ * VoxSlice - ControlPanel
  * UIコントロール群（再生、区切らせるボタン、ダウンロードなど）のイベントを管理するクラス
  */
 export default class ControlPanel {
