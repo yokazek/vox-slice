@@ -1,5 +1,5 @@
-node_modules/*
-test/*
-package-lock.json
-package.json
-test_runner.js
+.DS_Store
+Thumbs.db
+
+# Project local files (Private)
+test/
