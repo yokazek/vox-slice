@@ -12,9 +12,6 @@ export default class ControlPanel {
         this.fileNameDisplay = document.getElementById('file-name-display');
 
         // 再生コントロール関連
-        this.btnPlayPause = document.getElementById('btn-play-pause');
-        this.iconPlay = this.btnPlayPause.querySelector('.icon-play');
-        this.iconPause = this.btnPlayPause.querySelector('.icon-pause');
         this.currentTimeDisplay = document.getElementById('current-time');
         this.totalTimeDisplay = document.getElementById('total-time');
         this.btnLoopToggle = document.getElementById('btn-loop-toggle');
@@ -25,9 +22,9 @@ export default class ControlPanel {
         this.inputSilenceThresh = document.getElementById('input-silence-thresh');
         this.inputSilenceDuration = document.getElementById('input-silence-duration');
 
-        // エクスポート関連
-        this.btnDownloadAll = document.getElementById('btn-download-all');
+        // エクスポートフォーマットは main.js や RegionListView から直接取れるか、もしくは残す
         this.exportFormatSelect = document.getElementById('export-format');
+        this.btnDownloadAll = document.getElementById('btn-download-all');
 
         // 処理中オーバーレイ
         this.processingOverlay = document.getElementById('processing-overlay');
@@ -36,9 +33,9 @@ export default class ControlPanel {
 
         // 外部に通知するイベントコールバック群
         this.onFileSelected = null;       // (file)
-        this.onPlayPauseClick = null;     // ()
         this.onLoopToggleClick = null;    // (isLooping)
         this.onSplitClick = null;         // ()
+        this.onAutoSilenceClick = null;   // (thresholdDb, duration)
         this.onAutoSilenceClick = null;   // (thresholdDb, duration)
         this.onDownloadClick = null;      // (format)
 
@@ -83,10 +80,6 @@ export default class ControlPanel {
         });
 
         // --- 2. プレイヤーコントロール関連 ---
-        this.btnPlayPause.addEventListener('click', () => {
-            if (this.onPlayPauseClick) this.onPlayPauseClick();
-        });
-
         // ループボタンの実装
         this.isLooping = false;
         this.btnLoopToggle.addEventListener('click', () => {
@@ -114,24 +107,23 @@ export default class ControlPanel {
         });
 
         // --- 3. エクスポート関連 ---
-        this.btnDownloadAll.addEventListener('click', () => {
-            if (this.onDownloadClick) {
-                const format = this.exportFormatSelect.value; // 'wav' or 'mp3'
-                this.onDownloadClick(format);
-            }
-        });
+        if (this.btnDownloadAll) {
+            this.btnDownloadAll.addEventListener('click', () => {
+                if (this.onDownloadClick) {
+                    const format = this.exportFormatSelect.value;
+                    this.onDownloadClick(format);
+                }
+            });
+        }
 
         // --- 4. キーボードショートカット ---
         document.addEventListener('keydown', (e) => {
             // 入力フィールド（リスト上の数値変更など）にフォーカスがあるときは無視
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
 
-            // Space key => 再生/一時停止
+            // Space key => 無効化（以前の全体再生を削除）
             if (e.code === 'Space') {
                 e.preventDefault();
-                if (this.onPlayPauseClick && !this.workspace.classList.contains('hidden')) {
-                    this.onPlayPauseClick();
-                }
             }
 
             // Enter key => 現在位置で区切る
@@ -160,16 +152,10 @@ export default class ControlPanel {
     // ====== UIの状態更新メソッド ======
 
     /**
-     * 再生・停止ボタンの表示切り替え
+     * 再生状態に応じてPlay/Pauseアイコンを切り替える (ボタン削除に伴い無効化)
      */
     setPlayingState(isPlaying) {
-        if (isPlaying) {
-            this.iconPlay.classList.add('hidden');
-            this.iconPause.classList.remove('hidden');
-        } else {
-            this.iconPlay.classList.remove('hidden');
-            this.iconPause.classList.add('hidden');
-        }
+        // 何もしない
     }
 
     /**

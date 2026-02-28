@@ -13,6 +13,7 @@ export default class SegmentListView {
         this.onAddSplit = null;     // (timeSec)
         this.onRemoveSegment = null; // (segmentIndex)
         this.onPlayRegion = null;    // (segmentIndex)
+        this.onDownloadRegion = null; // (segmentIndex)
 
         this.btnAddSplit = this.container.querySelector('#btn-add-split');
         this.inputSplitTime = this.container.querySelector('#input-split-time');
@@ -55,8 +56,42 @@ export default class SegmentListView {
 
         segments.forEach((segment) => {
             const tr = this._createRow(segment, segments.length);
+            // 行にIDを付与して後から検索できるようにする
+            tr.id = `segment-row-${segment.index}`;
             this.tbody.appendChild(tr);
         });
+    }
+
+    /**
+     * 指定されたインデックスの行をハイライトし、必要ならスクロールで表示する
+     * @param {number} index ハイライトするセグメントのインデックス
+     */
+    highlightRow(index) {
+        // 現在のハイライトをすべて解除
+        const allRows = Array.from(this.tbody.querySelectorAll('tr'));
+        allRows.forEach(tr => {
+            tr.style.backgroundColor = '';
+            tr.style.borderLeft = '';
+        });
+
+        // 対象の行を取得
+        const targetRow = this.tbody.querySelector(`#segment-row-${index}`);
+        if (!targetRow) return;
+
+        // ハイライトのスタイルを直接またはクラスで適用 (ここでは簡便に直接適用)
+        targetRow.style.backgroundColor = 'rgba(251, 188, 4, 0.15)'; // primary colorの薄い版
+        targetRow.style.borderLeft = '4px solid var(--clr-primary)';
+
+        // スクロール範囲外ならスクロールして見えるようにする
+        const containerRect = this.container.getBoundingClientRect();
+        const rowRect = targetRow.getBoundingClientRect();
+
+        // theadの高さ分などのオフセット（ヘッダーで隠れるのを防ぐ）
+        const offset = 40;
+
+        if (rowRect.top < containerRect.top + offset || rowRect.bottom > containerRect.bottom) {
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 
     /**
@@ -91,6 +126,7 @@ export default class SegmentListView {
             </td>
             <td>
                 <button class="btn btn-secondary btn-sm play-btn" title="この区間だけを再生します" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; margin-right: 4px;">▶ 再生</button>
+                <button class="btn btn-primary btn-sm dl-btn" title="この区間だけを書き出します" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; margin-right: 4px;" ${segment.active ? '' : 'disabled'}>保存</button>
                 <button class="btn btn-danger btn-sm delete-btn" title="直前の区切り線を削除して結合します" style="padding: 2px 8px; font-size: 0.75rem; background-color: var(--clr-danger, #ef4444); color: white; border: none; border-radius: 4px; cursor: pointer;">削 除</button>
             </td>
         `;
@@ -135,6 +171,14 @@ export default class SegmentListView {
         playBtn.addEventListener('click', () => {
             if (this.onPlayRegion) {
                 this.onPlayRegion(segment.index);
+            }
+        });
+
+        // 保存ボタンのクリック時
+        const dlBtn = tr.querySelector('.dl-btn');
+        dlBtn.addEventListener('click', () => {
+            if (this.onDownloadRegion) {
+                this.onDownloadRegion(segment.index);
             }
         });
 

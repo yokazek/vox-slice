@@ -20,8 +20,9 @@ export default class ExportUseCase {
      * @param {Array} regions - ダウンロード対象のRegionオブジェクト配列
      * @param {string} format - 'wav' または 'mp3'
      * @param {Function} progressCallback - 進捗通知用コールバック (statusText, percent)
+     * @param {boolean} asZip - ZIP圧縮して単一ファイルにするかどうか（デフォルトtrue）
      */
-    async execute(regions, format, progressCallback) {
+    async execute(regions, format, progressCallback, asZip = true) {
         if (!regions || regions.length === 0) {
             throw new Error("ダウンロード対象の区間がありません。");
         }
@@ -51,19 +52,40 @@ export default class ExportUseCase {
             fileIndex++;
         }
 
-        if (progressCallback) {
-            progressCallback(`ZIPファイルを圧縮中...`, 50);
-        }
-
-        // 2. ZIP生成とダウンロードの指示
-        await this.zipExporter.exportAsZip(fileMap, 'VoiceSlicer_Export.zip', (metadata) => {
+        // 2. ZIP生成とダウンロードの指示、または個別ダウンロード
+        if (asZip) {
             if (progressCallback) {
-                progressCallback(`ZIPファイルを圧縮中... ${metadata.percent.toFixed(1)}%`, 50 + (metadata.percent / 2));
+                progressCallback(`ZIPファイルを圧縮中...`, 50);
             }
-        });
+            await this.zipExporter.exportAsZip(fileMap, 'VoiceSlicer_Export.zip', (metadata) => {
+                if (progressCallback) {
+                    progressCallback(`ZIPファイルを圧縮中... ${metadata.percent.toFixed(1)}%`, 50 + (metadata.percent / 2));
+                }
+            });
+        } else {
+            // 個別ファイルのままブラウザの機能でダウンロードする
+            for (const file of fileMap) {
+                this._downloadSingleFile(file.blob, file.filename);
+            }
+        }
 
         if (progressCallback) {
             progressCallback(`処理完了`, 100);
         }
+    }
+
+    _downloadSingleFile(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
     }
 }

@@ -62,10 +62,6 @@ class App {
             }
         };
 
-        this.controlPanel.onPlayPauseClick = () => {
-            if (!this.waveformView.wavesurfer) return;
-            this.waveformView.wavesurfer.playPause();
-        };
 
         this.controlPanel.onLoopToggleClick = (isLooping) => {
             this.waveformView.setLoopMode(isLooping);
@@ -134,6 +130,42 @@ class App {
             }, 50);
         };
 
+        this.segmentListView.onDownloadRegion = async (index) => {
+            const audioBuffer = this.waveformView.wavesurfer.getDecodedData();
+            if (!audioBuffer) {
+                alert("音声データが読み込まれていません。");
+                return;
+            }
+
+            const regions = this.editorUseCase.getRegions();
+            const targetSegment = regions.find(r => r.index === index);
+            if (!targetSegment || !targetSegment.active) {
+                alert("指定された区間が存在しないか、除外されています。");
+                return;
+            }
+
+            const formatSelect = document.getElementById('export-format');
+            const format = formatSelect ? formatSelect.value : 'wav';
+
+            this.controlPanel.showProcessingState(true, '準備中...', 0);
+            try {
+                // 配列として単一のセグメントを渡す
+                await this.exportUseCase.execute(
+                    [targetSegment],
+                    format,
+                    (statusText, progressPercent) => {
+                        this.controlPanel.showProcessingState(true, statusText, progressPercent);
+                    },
+                    false // ZIP化せずそのままダウンロード
+                );
+            } catch (error) {
+                console.error("Download Error:", error);
+                alert("ダウンロード処理中にエラーが発生しました。\n" + error.message);
+            } finally {
+                this.controlPanel.showProcessingState(false);
+            }
+        };
+
         this.controlPanel.onDownloadClick = async (format) => {
             const audioBuffer = this.waveformView.wavesurfer.getDecodedData();
             if (!audioBuffer) {
@@ -174,6 +206,13 @@ class App {
 
         this.waveformView.onTimeUpdate = (currentTime) => {
             this.controlPanel.updateTimeDisplay(currentTime);
+
+            // 現在の再生時刻が含まれる区間を探してハイライトする
+            const regions = this.editorUseCase.getRegions();
+            const currentRegion = regions.find(reg => currentTime >= reg.start && currentTime <= reg.end);
+            if (currentRegion) {
+                this.segmentListView.highlightRow(currentRegion.index);
+            }
         };
 
         this.waveformView.onSliceLineCreated = (time) => {
