@@ -200,16 +200,17 @@ h6 {
 }
 
 #file-info-group {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 1rem;
     opacity: 0;
     transform: translateX(-20px);
-    transition: all 0.5s ease 0.3s;
+    transition: all 0.5s ease 0.3s, display 0.5s allow-discrete;
     pointer-events: none;
 }
 
 .workspace-active #file-info-group {
+    display: flex;
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
