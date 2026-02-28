@@ -16,11 +16,21 @@ export default class ControlPanel {
         this.totalTimeDisplay = document.getElementById('total-time');
         this.btnLoopToggle = document.getElementById('btn-loop-toggle');
 
-        // アクション関連
+        // アクション・履歴関連
+        this.btnUndo = document.getElementById('btn-undo');
+        this.btnRedo = document.getElementById('btn-redo');
         this.btnSplit = document.getElementById('btn-split');
         this.btnAutoSilence = document.getElementById('btn-auto-silence');
         this.inputSilenceThresh = document.getElementById('input-silence-thresh');
         this.inputSilenceDuration = document.getElementById('input-silence-duration');
+
+        // 音量コントロール
+        this.volumeSlider = document.getElementById('volume-slider');
+
+        // プロジェクト保存/読込
+        this.btnSaveProject = document.getElementById('btn-save-project');
+        this.btnLoadProject = document.getElementById('btn-load-project');
+        this.projectInput = document.getElementById('project-input');
 
         // エクスポートフォーマットは main.js や RegionListView から直接取れるか、もしくは残す
         this.exportFormatSelect = document.getElementById('export-format');
@@ -37,8 +47,15 @@ export default class ControlPanel {
         this.onLoopToggleClick = null;    // (isLooping)
         this.onSplitClick = null;         // ()
         this.onAutoSilenceClick = null;   // (thresholdDb, duration)
-        this.onAutoSilenceClick = null;   // (thresholdDb, duration)
         this.onDownloadClick = null;      // (format)
+
+        this.onVolumeChange = null;       // (volume)
+        this.onUndoClick = null;          // ()
+        this.onRedoClick = null;          // ()
+        this.onSaveProjectClick = null;   // ()
+        this.onLoadProjectFile = null;    // (file)
+        this.onPrevRegionRequest = null;  // ()
+        this.onNextRegionRequest = null;  // ()
 
         this._setupEvents();
     }
@@ -107,6 +124,42 @@ export default class ControlPanel {
             }
         });
 
+        if (this.btnUndo) {
+            this.btnUndo.addEventListener('click', () => {
+                if (this.onUndoClick) this.onUndoClick();
+            });
+        }
+        if (this.btnRedo) {
+            this.btnRedo.addEventListener('click', () => {
+                if (this.onRedoClick) this.onRedoClick();
+            });
+        }
+
+        if (this.volumeSlider) {
+            this.volumeSlider.addEventListener('input', (e) => {
+                if (this.onVolumeChange) this.onVolumeChange(parseFloat(e.target.value));
+            });
+        }
+
+        if (this.btnSaveProject) {
+            this.btnSaveProject.addEventListener('click', () => {
+                if (this.onSaveProjectClick) this.onSaveProjectClick();
+            });
+        }
+
+        if (this.btnLoadProject && this.projectInput) {
+            this.btnLoadProject.addEventListener('click', () => {
+                this.projectInput.click();
+            });
+
+            this.projectInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0 && this.onLoadProjectFile) {
+                    this.onLoadProjectFile(e.target.files[0]);
+                }
+                this.projectInput.value = ''; // リセット
+            });
+        }
+
         // --- 3. エクスポート関連 ---
         if (this.btnDownloadAll) {
             this.btnDownloadAll.addEventListener('click', () => {
@@ -128,6 +181,40 @@ export default class ControlPanel {
                 if (this.onSpaceKeyPress && !this.workspace.classList.contains('hidden')) {
                     this.onSpaceKeyPress();
                 }
+            }
+
+            // Ctrl+Z (Undo) / Ctrl+Y or Ctrl+Shift+Z (Redo)
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+            if (isCmdOrCtrl && e.code === 'KeyZ') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    // Redo
+                    if (this.onRedoClick) this.onRedoClick();
+                } else {
+                    // Undo
+                    if (this.onUndoClick) this.onUndoClick();
+                }
+                return;
+            }
+
+            if (isCmdOrCtrl && e.code === 'KeyY') {
+                e.preventDefault();
+                if (this.onRedoClick) this.onRedoClick();
+                return;
+            }
+
+            // ArrowLeft / ArrowRight => 区間移動
+            if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                if (this.onPrevRegionRequest) this.onPrevRegionRequest();
+                return;
+            }
+            if (e.code === 'ArrowRight' || e.code === 'Tab') {
+                e.preventDefault();
+                if (this.onNextRegionRequest) this.onNextRegionRequest();
+                return;
             }
 
             // Enter key => 現在位置で区切る
@@ -154,6 +241,26 @@ export default class ControlPanel {
     }
 
     // ====== UIの状態更新メソッド ======
+
+    /**
+     * Undo/Redoボタンの有効化・無効化を切り替える
+     */
+    setHistoryState(canUndo, canRedo) {
+        if (this.btnUndo) {
+            if (canUndo) {
+                this.btnUndo.removeAttribute('disabled');
+            } else {
+                this.btnUndo.setAttribute('disabled', 'true');
+            }
+        }
+        if (this.btnRedo) {
+            if (canRedo) {
+                this.btnRedo.removeAttribute('disabled');
+            } else {
+                this.btnRedo.setAttribute('disabled', 'true');
+            }
+        }
+    }
 
     /**
      * 再生状態に応じてPlay/Pauseアイコンを切り替える (ボタン削除に伴い無効化)

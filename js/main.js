@@ -145,13 +145,72 @@ class App {
 
                 } catch (err) {
                     console.error("Silence Detection Error:", err);
-                    alert("解析エラー: " + err.message);
+                    alert("解析レベルのエラー: " + err.message);
                 } finally {
                     // 全ての処理が終わったらUI通知を再開し、一気に描画させる
                     this.editorUseCase.resumeNotify();
                     this.controlPanel.showProcessingState(false);
                 }
             }, 50);
+        };
+
+        this.controlPanel.onVolumeChange = (vol) => {
+            this.waveformView.setVolume(vol);
+        };
+
+        this.controlPanel.onUndoClick = () => {
+            this.editorUseCase.undo();
+        };
+
+        this.controlPanel.onRedoClick = () => {
+            this.editorUseCase.redo();
+        };
+
+        this.controlPanel.onPrevRegionRequest = () => {
+            this._moveSeekToSplit(-1);
+        };
+
+        this.controlPanel.onNextRegionRequest = () => {
+            this._moveSeekToSplit(1);
+        };
+
+        this.controlPanel.onSaveProjectClick = () => {
+            if (!this.currentFile) {
+                alert("音声ファイルが読み込まれていません。");
+                return;
+            }
+            const data = {
+                version: "1.0",
+                fileName: this.currentFile.name,
+                duration: this.editorUseCase.duration,
+                slicePoints: this.editorUseCase.slicePoints,
+                inactiveSegments: Array.from(this.editorUseCase.inactiveSegments)
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${this.currentFile.name.split('.')[0]}_project.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        this.controlPanel.onLoadProjectFile = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.slicePoints) throw new Error("不正なプロジェクトファイルです。");
+
+                    this.editorUseCase.suspendNotify();
+                    this.editorUseCase.slicePoints = data.slicePoints;
+                    this.editorUseCase.inactiveSegments = new Set(data.inactiveSegments || []);
+                    this.editorUseCase.resumeNotify();
+                } catch (err) {
+                    alert("読み込みエラー: " + err.message);
+                }
+            };
+            reader.readAsText(file);
         };
 
         this.segmentListView.onDownloadRegion = async (index) => {
@@ -283,7 +342,7 @@ class App {
             this.waveformView.updateSlicesAndSegments(slicePoints, regions);
             this.segmentListView.render(regions);
             this.segmentListView.show(regions.length > 0);
-
+            this.controlPanel.setHistoryState(this.editorUseCase.canUndo, this.editorUseCase.canRedo);
             this._updateDownloadButtonState();
         });
 
@@ -316,6 +375,24 @@ class App {
         this.segmentListView.onPlayRegion = (index) => {
             this.waveformView.playRegion(index);
         };
+    }
+
+    _moveSeekToSplit(direction) {
+        if (!this.waveformView.wavesurfer) return;
+        const currentTime = this.waveformView.getCurrentTime();
+        const duration = this.waveformView.getDuration();
+        const slicePoints = [0, ...this.editorUseCase.slicePoints, duration];
+
+        // 現在位置より前/後の最も近いポイントを探す
+        let targetTime = currentTime;
+        if (direction > 0) {
+            targetTime = slicePoints.find(p => p > currentTime + 0.1) ?? slicePoints[slicePoints.length - 1];
+        } else {
+            const prevPoints = slicePoints.filter(p => p < currentTime - 0.1);
+            targetTime = prevPoints.length > 0 ? prevPoints[prevPoints.length - 1] : 0;
+        }
+
+        this.waveformView.wavesurfer.setTime(targetTime);
     }
 
     _updateDownloadButtonState() {

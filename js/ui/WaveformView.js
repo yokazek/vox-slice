@@ -525,4 +525,13 @@ export default class WaveformView {
             target.play();
         }
     }
+
+    /**
+     * 音量を設定する (0.0 - 1.0)
+     */
+    setVolume(volume) {
+        if (this.wavesurfer) {
+            this.wavesurfer.setVolume(volume);
+        }
+    }
 }

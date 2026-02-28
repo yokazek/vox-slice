@@ -12,6 +12,10 @@ export default class EditorUseCase {
         this.inactiveSegments = new Set(); // 除外状態（Active=false）の区間インデックスのSet
         this.listeners = [];
         this._notifySuspended = false;
+
+        // Undo/Redo用の履歴管理
+        this.history = [];
+        this.historyIndex = -1;
     }
 
     /**
@@ -23,15 +27,73 @@ export default class EditorUseCase {
     }
 
     /**
-     * リスナーへの通知（オブザーバーパターン）
+     * リスナーへの通知と履歴保存（オブザーバーパターン）
+     * @param {boolean} saveHistory 履歴に保存するかどうか
      */
-    _notify() {
+    _notify(saveHistory = true) {
         if (this._notifySuspended) return;
+
+        if (saveHistory) {
+            this._saveState();
+        }
 
         if (this.listeners.length > 0) {
             const regions = this.getRegions();
             this.listeners.forEach(cb => cb(this.slicePoints, regions));
         }
+    }
+
+    _saveState() {
+        const state = {
+            slicePoints: [...this.slicePoints],
+            inactiveSegments: Array.from(this.inactiveSegments)
+        };
+
+        // 直前の状態と全く同じなら保存しない
+        if (this.historyIndex >= 0) {
+            const last = this.history[this.historyIndex];
+            const samePoints = last.slicePoints.length === state.slicePoints.length &&
+                last.slicePoints.every((v, i) => v === state.slicePoints[i]);
+            const sameInactive = last.inactiveSegments.length === state.inactiveSegments.length &&
+                last.inactiveSegments.every(v => state.inactiveSegments.includes(v));
+            if (samePoints && sameInactive) return;
+        }
+
+        // 現在のインデックスより後の履歴は削除（Undo後に別の操作をした場合）
+        this.history = this.history.slice(0, this.historyIndex + 1);
+        this.history.push(state);
+        this.historyIndex++;
+    }
+
+    undo() {
+        if (this.historyIndex > 0) {
+            this.historyIndex--;
+            this._restoreState();
+        }
+    }
+
+    redo() {
+        if (this.historyIndex < this.history.length - 1) {
+            this.historyIndex++;
+            this._restoreState();
+        }
+    }
+
+    get canUndo() {
+        return this.historyIndex > 0;
+    }
+
+    get canRedo() {
+        return this.historyIndex < this.history.length - 1;
+    }
+
+    _restoreState() {
+        const state = this.history[this.historyIndex];
+        this.slicePoints = [...state.slicePoints];
+        this.inactiveSegments = new Set(state.inactiveSegments);
+
+        // 履歴追加フラグをfalseにしてUIに通知
+        this._notify(false);
     }
 
     /**
@@ -57,7 +119,9 @@ export default class EditorUseCase {
         this.duration = duration;
         this.slicePoints = [];
         this.inactiveSegments.clear();
-        this._notify();
+        this.history = [];
+        this.historyIndex = -1;
+        this._notify(true); // 初期状態を履歴0にする
     }
 
     /**
