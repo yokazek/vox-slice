@@ -180,6 +180,10 @@ class App {
             this.editorUseCase.addSlicePoint(time);
         };
 
+        this.waveformView.onSliceLineDeleted = (index) => {
+            this.editorUseCase.removeSlicePoint(index);
+        };
+
         this.waveformView.onSliceLineMoved = (index, newTime) => {
             this.editorUseCase.moveSlicePoint(index, newTime);
         };

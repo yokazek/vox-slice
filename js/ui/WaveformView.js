@@ -146,13 +146,121 @@ export default class WaveformView {
             alert('音声の読み込み時にエラーが発生しました。');
         });
 
-        // 波形のクリックイベント（新規スライス追加）
-        this.wavesurfer.on('click', (relativeX) => {
-            // Regionのドラッグ等の操作中でなければ発火
-            const clickTime = relativeX * this.wavesurfer.getDuration();
+        // 波形のダブルクリックイベント（新規スライス追加）
+        this.wavesurfer.on('dblclick', (relativeX) => {
+            const dblClickTime = relativeX * this.wavesurfer.getDuration();
             if (this.onSliceLineCreated) {
-                this.onSliceLineCreated(clickTime);
+                this.onSliceLineCreated(dblClickTime);
             }
+        });
+
+        // 領域外へのドラッグ＆ドロップ（区切り線の削除）を検知するための状態管理
+        let isDraggingRegion = false;
+        let draggedRegionId = null;
+        let draggedEdge = null; // 'start' または 'end'
+
+        // ゴミ箱(ドラッグ削除)用のフローティングアイコン要素を作成
+        const trashOverlay = document.createElement('div');
+        trashOverlay.id = 'trash-floating-icon';
+        trashOverlay.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+        `;
+        // マウスに追従する設定
+        trashOverlay.style.position = 'fixed';
+        // カーソルの右下に浮くように配置調整
+        trashOverlay.style.width = '32px';
+        trashOverlay.style.height = '32px';
+        trashOverlay.style.display = 'flex';
+        trashOverlay.style.alignItems = 'center';
+        trashOverlay.style.justifyContent = 'center';
+        trashOverlay.style.background = '#ef4444'; // 危険を表す赤色
+        trashOverlay.style.color = 'white';
+        trashOverlay.style.borderRadius = '50%';
+        trashOverlay.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.6)';
+        trashOverlay.style.pointerEvents = 'none'; // イベント貫通
+        trashOverlay.style.transition = 'opacity 0.2s';
+        trashOverlay.style.opacity = '0';
+        trashOverlay.style.zIndex = '9999';
+        document.body.appendChild(trashOverlay);
+
+        // 画面全体を覆う赤い枠線（削除モードの強調表現）
+        const dangerBorder = document.createElement('div');
+        dangerBorder.style.position = 'fixed';
+        dangerBorder.style.top = '0';
+        dangerBorder.style.left = '0';
+        dangerBorder.style.width = '100vw';
+        dangerBorder.style.height = '100vh';
+        dangerBorder.style.boxShadow = 'inset 0 0 0 5px #ef4444';
+        dangerBorder.style.pointerEvents = 'none';
+        dangerBorder.style.transition = 'opacity 0.2s';
+        dangerBorder.style.opacity = '0';
+        dangerBorder.style.zIndex = '9998';
+        document.body.appendChild(dangerBorder);
+
+        this.wsRegions.on('region-created', (region) => {
+            // マウスの押下時にドラッグ開始を記録
+            region.element.addEventListener('mousedown', (e) => {
+                const rect = region.element.getBoundingClientRect();
+                const distanceToLeft = Math.abs(e.clientX - rect.left);
+                const distanceToRight = Math.abs(e.clientX - rect.right);
+
+                // 左右の端（ハンドル付近）を掴んだ時のみ、ドラッグ削除の待機状態にする
+                if (distanceToLeft <= 15) {
+                    isDraggingRegion = true;
+                    draggedRegionId = region.id;
+                    draggedEdge = 'start';
+                } else if (distanceToRight <= 15) {
+                    isDraggingRegion = true;
+                    draggedRegionId = region.id;
+                    draggedEdge = 'end';
+                }
+            });
+        });
+
+        // document全体でマウスアップ・ムーブを監視し、ドラッグ終了時に画面外（波形外）かどうかの判定を行う
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingRegion && draggedEdge) {
+                const rect = this.container.getBoundingClientRect();
+                const isOutside = e.clientY < rect.top || e.clientY > rect.bottom || e.clientX < rect.left || e.clientX > rect.right;
+                if (isOutside) {
+                    // カーソルの少し右下 (offset 10px, 15px) にアイコンを追従させる
+                    trashOverlay.style.left = (e.clientX + 10) + 'px';
+                    trashOverlay.style.top = (e.clientY + 15) + 'px';
+                    trashOverlay.style.opacity = '1';
+                    dangerBorder.style.opacity = '1';
+                } else {
+                    trashOverlay.style.opacity = '0';
+                    dangerBorder.style.opacity = '0';
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (isDraggingRegion && draggedRegionId && draggedEdge) {
+                const rect = this.container.getBoundingClientRect();
+                // マウスカーソルが波形コンテナ（上下左右）の領域外に行ってドロップされたら削除判定
+                const isOutside = e.clientY < rect.top || e.clientY > rect.bottom || e.clientX < rect.left || e.clientX > rect.right;
+
+                if (isOutside) {
+                    const indexStr = draggedRegionId.split('_')[1];
+                    if (indexStr && this.onSliceLineDeleted) {
+                        const index = parseInt(indexStr);
+                        // 左端（start）をドラッグしていたなら、その手前の線(index - 1)が正解
+                        // 右端（end）をドラッグしていたなら、その後ろの線(index)が正解
+                        const targetLineIndex = (draggedEdge === 'start') ? (index - 1) : index;
+                        if (targetLineIndex >= 0) {
+                            this.onSliceLineDeleted(targetLineIndex);
+                        }
+                    }
+                }
+            }
+            isDraggingRegion = false;
+            draggedRegionId = null;
+            draggedEdge = null;
+            trashOverlay.style.opacity = '0';
+            dangerBorder.style.opacity = '0';
         });
 
         // --- 波形領域上のシステム系イベント ---
@@ -241,12 +349,14 @@ export default class WaveformView {
 
             // 左側の境界（前回のSlicePoint(index-1)に相当）が動いた場合
             if (Math.abs(region.start - region.element.dataset.origStart) > 0.001) {
+                draggedEdge = 'start';
                 if (index > 0 && this.onSliceLineMoved) {
                     this.onSliceLineMoved(index - 1, region.start);
                 }
             }
             // 右側の境界（次回のSlicePoint(index)に相当）が動いた場合
             else if (Math.abs(region.end - region.element.dataset.origEnd) > 0.001) {
+                draggedEdge = 'end';
                 if (this.onSliceLineMoved) {
                     this.onSliceLineMoved(index, region.end);
                 }
