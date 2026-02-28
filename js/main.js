@@ -62,7 +62,31 @@ class App {
             }
         };
 
+        // スペースキー押下時に、現在位置が含まれる区間を再生（または一時停止）する
+        this.controlPanel.onSpaceKeyPress = () => {
+            if (!this.waveformView.wavesurfer) return;
 
+            // すでに再生中の場合は一時停止
+            if (this.isPlaying) {
+                this.waveformView.wavesurfer.pause();
+                return;
+            }
+
+            // 再生中でない場合は、現在の再生位置が含まれる区間を探して再生
+            const currentTime = this.waveformView.getCurrentTime();
+            const regions = this.editorUseCase.getRegions();
+            const currentRegion = regions.find(reg => currentTime >= reg.start && currentTime <= reg.end);
+
+            if (currentRegion) {
+                // SegmentListViewの「再生」ボタンを押した際と同じ処理を呼び出す
+                if (this.segmentListView.onPlayRegion) {
+                    this.segmentListView.onPlayRegion(currentRegion.index);
+                }
+            } else {
+                // 特殊な場合（区間外など）はそのまま通常再生
+                this.waveformView.wavesurfer.play();
+            }
+        };
         this.controlPanel.onLoopToggleClick = (isLooping) => {
             this.waveformView.setLoopMode(isLooping);
             // グローバルな再生時のループ処理（wavesurfer本体）にも反映させたい場合は以下を有効化

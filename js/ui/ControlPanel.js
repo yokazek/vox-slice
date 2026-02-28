@@ -33,6 +33,7 @@ export default class ControlPanel {
 
         // 外部に通知するイベントコールバック群
         this.onFileSelected = null;       // (file)
+        this.onSpaceKeyPress = null;      // ()
         this.onLoopToggleClick = null;    // (isLooping)
         this.onSplitClick = null;         // ()
         this.onAutoSilenceClick = null;   // (thresholdDb, duration)
@@ -121,9 +122,12 @@ export default class ControlPanel {
             // 入力フィールド（リスト上の数値変更など）にフォーカスがあるときは無視
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
 
-            // Space key => 無効化（以前の全体再生を削除）
+            // Space key => 現在位置の区間を再生 / 一時停止
             if (e.code === 'Space') {
                 e.preventDefault();
+                if (this.onSpaceKeyPress && !this.workspace.classList.contains('hidden')) {
+                    this.onSpaceKeyPress();
+                }
             }
 
             // Enter key => 現在位置で区切る
