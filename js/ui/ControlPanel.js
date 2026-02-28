@@ -20,6 +20,9 @@ export default class ControlPanel {
 
         // アクション関連
         this.btnSplit = document.getElementById('btn-split');
+        this.btnAutoSilence = document.getElementById('btn-auto-silence');
+        this.inputSilenceThresh = document.getElementById('input-silence-thresh');
+        this.inputSilenceDuration = document.getElementById('input-silence-duration');
 
         // エクスポート関連
         this.btnDownloadAll = document.getElementById('btn-download-all');
@@ -34,6 +37,7 @@ export default class ControlPanel {
         this.onFileSelected = null;       // (file)
         this.onPlayPauseClick = null;     // ()
         this.onSplitClick = null;         // ()
+        this.onAutoSilenceClick = null;   // (thresholdDb, duration)
         this.onDownloadClick = null;      // (format)
 
         this._setupEvents();
@@ -83,6 +87,14 @@ export default class ControlPanel {
 
         this.btnSplit.addEventListener('click', () => {
             if (this.onSplitClick) this.onSplitClick();
+        });
+
+        this.btnAutoSilence.addEventListener('click', () => {
+            if (this.onAutoSilenceClick) {
+                const thresh = parseFloat(this.inputSilenceThresh.value);
+                const duration = parseFloat(this.inputSilenceDuration.value);
+                this.onAutoSilenceClick(thresh, duration);
+            }
         });
 
         // --- 3. エクスポート関連 ---

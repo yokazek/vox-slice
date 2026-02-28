@@ -78,6 +78,59 @@ class App {
             this.editorUseCase.addSlicePoint(currentTime);
         };
 
+        this.controlPanel.onAutoSilenceClick = (thresholdDb, duration) => {
+            const audioBuffer = this.waveformView.wavesurfer?.getDecodedData();
+            if (!audioBuffer) return;
+
+            this.controlPanel.showProcessingState(true, '無音部分を解析中...', 50);
+
+            // UIが更新される隙間を作るためsetTimeoutを使用
+            setTimeout(() => {
+                try {
+                    const silenceRegions = this._detectSilence(audioBuffer, thresholdDb, duration);
+
+                    if (silenceRegions.length === 0) {
+                        alert("指定された条件（音量、長さ）を満たす無音区間は見つかりませんでした。");
+                        return;
+                    }
+
+                    // 大量更新時のUIフリーズやチラツキを防ぐため、一時的にUIへの通知を停止
+                    this.editorUseCase.suspendNotify();
+
+                    // 無音区間の開始と終了に区切り線を追加する
+                    silenceRegions.forEach(reg => {
+                        this.editorUseCase.addSlicePoint(reg.start);
+                        this.editorUseCase.addSlicePoint(reg.end);
+                    });
+
+                    // 挿入後、すべてのRegion（区間）のリストを取得する
+                    const updatedRegions = this.editorUseCase.getRegions();
+
+                    // 無音区間に含まれているRegionを特定して、除外(Inactive)へ切り替える
+                    updatedRegions.forEach(reg => {
+                        // 区間の中央時間を取得
+                        const mid = (reg.start + reg.end) / 2;
+
+                        // 中央の時間が、検出した無音区間のどれかに含まれているかを判定
+                        const isInsideSilence = silenceRegions.some(sr => mid >= sr.start && mid <= sr.end);
+
+                        // 無音領域であり、かつ現在アクティブならオフにする
+                        if (isInsideSilence && reg.active) {
+                            this.editorUseCase.toggleRegionActive(reg.index);
+                        }
+                    });
+
+                } catch (err) {
+                    console.error("Silence Detection Error:", err);
+                    alert("解析エラー: " + err.message);
+                } finally {
+                    // 全ての処理が終わったらUI通知を再開し、一気に描画させる
+                    this.editorUseCase.resumeNotify();
+                    this.controlPanel.showProcessingState(false);
+                }
+            }, 50);
+        };
+
         this.controlPanel.onDownloadClick = async (format) => {
             const audioBuffer = this.waveformView.wavesurfer.getDecodedData();
             if (!audioBuffer) {
@@ -194,6 +247,61 @@ class App {
     _updateDownloadButtonState() {
         const activeRegions = this.editorUseCase.getActiveRegions();
         this.controlPanel.setDownloadEnabled(activeRegions.length > 0);
+    }
+
+    /**
+     * 音声バッファを解析して無音区間の配列を返す
+     * @param {AudioBuffer} audioBuffer
+     * @param {number} thresholdDb (例: -40)
+     * @param {number} minSeconds (例: 0.5)
+     */
+    _detectSilence(audioBuffer, thresholdDb, minSeconds) {
+        // 片方のチャンネル(Left)を基準に判定する
+        const channelData = audioBuffer.getChannelData(0);
+        const sampleRate = audioBuffer.sampleRate;
+        const threshold = Math.pow(10, thresholdDb / 20); // dBから振幅(Amplitude)へ変換
+
+        // 50msごとに区切って判定（細かすぎると処理が重くなり、粗すぎると精度が落ちるため）
+        const windowSize = Math.floor(sampleRate * 0.05);
+        const regions = [];
+
+        let isSilent = false;
+        let silenceStart = 0;
+
+        for (let i = 0; i < channelData.length; i += windowSize) {
+            let maxAmp = 0;
+            // 指定したウィンドウ内の最大音量を取得する
+            const endIdx = Math.min(i + windowSize, channelData.length);
+            for (let j = i; j < endIdx; j++) {
+                const v = Math.abs(channelData[j]);
+                if (v > maxAmp) maxAmp = v;
+            }
+
+            const currentlySilent = maxAmp < threshold;
+
+            if (currentlySilent && !isSilent) {
+                // 新しい無音区間が始まった
+                isSilent = true;
+                silenceStart = i / sampleRate;
+            } else if (!currentlySilent && isSilent) {
+                // 無音区間が終わった（音が鳴った）
+                isSilent = false;
+                const silenceEnd = i / sampleRate;
+                if ((silenceEnd - silenceStart) >= minSeconds) {
+                    regions.push({ start: silenceStart, end: silenceEnd });
+                }
+            }
+        }
+
+        // ファイルの末尾まで無音で終わっていた場合の処理
+        if (isSilent) {
+            const silenceEnd = channelData.length / sampleRate;
+            if ((silenceEnd - silenceStart) >= minSeconds) {
+                regions.push({ start: silenceStart, end: silenceEnd });
+            }
+        }
+
+        return regions;
     }
 }
 

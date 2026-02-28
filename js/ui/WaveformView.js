@@ -323,21 +323,9 @@ export default class WaveformView {
                     // イベントを貫通させるのでハンドル操作も邪魔しない
                     inactiveLayer.style.pointerEvents = 'none';
 
-                    // CSSのmix-blend-modeを活用して、背後にある波形の色をグレーにする
-                    const fg = document.createElement('div');
-                    fg.style.position = 'absolute';
-                    fg.style.top = '0'; fg.style.left = '0'; fg.style.width = '100%'; fg.style.height = '100%';
-                    fg.style.backgroundColor = '#475569'; // スレート色
-                    fg.style.mixBlendMode = 'color';
-
-                    // 若干暗くするためのレイヤー
-                    const dark = document.createElement('div');
-                    dark.style.position = 'absolute';
-                    dark.style.top = '0'; dark.style.left = '0'; dark.style.width = '100%'; dark.style.height = '100%';
-                    dark.style.backgroundColor = 'rgba(15, 23, 42, 0.4)';
-
-                    inactiveLayer.appendChild(fg);
-                    inactiveLayer.appendChild(dark);
+                    // CSSのbackdrop-filterを活用して、背後にある波形の色をグレーにして暗くする（視認性を確保）
+                    inactiveLayer.style.backgroundColor = 'rgba(15, 23, 42, 0.4)';
+                    inactiveLayer.style.backdropFilter = 'grayscale(100%) brightness(0.6)';
                     wsRegion.element.appendChild(inactiveLayer);
                 }
             } else {

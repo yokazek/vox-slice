@@ -11,6 +11,7 @@ export default class EditorUseCase {
         this.slicePoints = []; // 区切り線の時間位置の配列 [t1, t2, ...] (昇順)
         this.inactiveSegments = new Set(); // 除外状態（Active=false）の区間インデックスのSet
         this.listeners = [];
+        this._notifySuspended = false;
     }
 
     /**
@@ -25,10 +26,27 @@ export default class EditorUseCase {
      * リスナーへの通知（オブザーバーパターン）
      */
     _notify() {
+        if (this._notifySuspended) return;
+
         if (this.listeners.length > 0) {
             const regions = this.getRegions();
             this.listeners.forEach(cb => cb(this.slicePoints, regions));
         }
+    }
+
+    /**
+     * 複数処理を並行して行うための通知停止
+     */
+    suspendNotify() {
+        this._notifySuspended = true;
+    }
+
+    /**
+     * 通知再開
+     */
+    resumeNotify() {
+        this._notifySuspended = false;
+        this._notify();
     }
 
     /**

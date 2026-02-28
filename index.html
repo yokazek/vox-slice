@@ -83,6 +83,31 @@
                             </svg>
                             区切る
                         </button>
+
+                        <div class="auto-split-controls"
+                            style="display: flex; align-items: center; gap: 0.5rem; border-left: 1px solid var(--clr-border); padding-left: 1rem; margin-left: 0.5rem;">
+                            <label title="この音量(dB)未満を無音とみなします" style="font-size: 0.8rem; color: var(--clr-text-muted);">
+                                しきい値:
+                                <input type="number" id="input-silence-thresh" value="-60" max="0" min="-100"
+                                    style="width: 60px; padding: 0.4rem; background: var(--clr-bg-card); color: white; border: 1px solid var(--clr-border); border-radius: 4px;">
+                                dB
+                            </label>
+                            <label title="この秒数以上の無音を自動カットします" style="font-size: 0.8rem; color: var(--clr-text-muted);">
+                                長さ:
+                                <input type="number" id="input-silence-duration" value="0.3" min="0.1" step="0.1"
+                                    style="width: 60px; padding: 0.4rem; background: var(--clr-bg-card); color: white; border: 1px solid var(--clr-border); border-radius: 4px;">
+                                秒
+                            </label>
+                            <button id="btn-auto-silence" class="btn btn-secondary" title="無音部分を自動検出して一括で区切り・除外します">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M12 2v20"></path>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                                無音をカット
+                            </button>
+                        </div>
                     </div>
 
                     <div class="controls-group export-controls">
