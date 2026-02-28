@@ -125,9 +125,15 @@ export default class SegmentListView {
                 </span>
             </td>
             <td>
-                <button class="btn btn-secondary btn-sm play-btn" title="この区間だけを再生します" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; margin-right: 4px;">▶ 再生</button>
-                <button class="btn btn-primary btn-sm dl-btn" title="この区間だけを書き出します" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; margin-right: 4px;" ${segment.active ? '' : 'disabled'}>保存</button>
-                <button class="btn btn-danger btn-sm delete-btn" title="直前の区切り線を削除して結合します" style="padding: 2px 8px; font-size: 0.75rem; background-color: var(--clr-danger, #ef4444); color: white; border: none; border-radius: 4px; cursor: pointer;">削 除</button>
+                <button class="btn-icon-sm play-btn" title="この区間だけを再生 (Space)" style="display: inline-flex; border: 1px solid var(--clr-border); background: transparent; margin-right: 4px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+                <button class="btn-icon-sm dl-btn" title="この区間だけを保存" style="display: inline-flex; border: 1px solid var(--clr-border); background: transparent; margin-right: 4px;" ${segment.active ? '' : 'disabled'}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </button>
+                <button class="btn-icon-sm delete-btn" title="区切り線を削除して前の区間と結合" style="display: inline-flex; border: 1px solid var(--clr-border); background: transparent;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
             </td>
         `;
 

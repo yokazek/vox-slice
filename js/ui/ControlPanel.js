@@ -98,15 +98,10 @@ export default class ControlPanel {
         });
 
         // --- 2. プレイヤーコントロール関連 ---
-        // ループボタンの実装
+        // ループボタンの実装 (スイッチ)
         this.isLooping = false;
-        this.btnLoopToggle.addEventListener('click', () => {
-            this.isLooping = !this.isLooping;
-            if (this.isLooping) {
-                this.btnLoopToggle.style.color = 'var(--clr-primary)'; // ハイライトする
-            } else {
-                this.btnLoopToggle.style.color = 'var(--clr-text-muted)';
-            }
+        this.btnLoopToggle.addEventListener('change', () => {
+            this.isLooping = this.btnLoopToggle.checked;
             if (this.onLoopToggleClick) {
                 this.onLoopToggleClick(this.isLooping);
             }

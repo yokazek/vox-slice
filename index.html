@@ -14,7 +14,6 @@
     <div class="app-container">
         <header class="app-header">
             <h1>VoiceSlicer</h1>
-            <p>WAV/MP3ファイルをブラウザ上で簡単にスライスしてダウンロード</p>
         </header>
 
         <main class="main-content">
@@ -80,48 +79,39 @@
                     </div>
                 </div>
 
-                <!-- コントロールパネル -->
-                <div class="controls-panel">
-                    <div class="controls-group playback-controls">
-                        <!-- 音量スライダー追加 -->
-                        <div class="volume-container" title="音量"
-                            style="display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                <!-- コントロールパネル (アイコン主体) -->
+                <div class="controls-panel"
+                    style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--clr-bg-card); border-top: 1px solid var(--clr-border);">
+
+                    <!-- 左: 音量系 -->
+                    <div class="controls-group" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="volume-container"
+                            style="display: flex; align-items: center; gap: 0.5rem; padding-right: 0.75rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" style="color: var(--clr-text-muted);">
+                                stroke-linejoin="round">
                                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                                 <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
                             </svg>
                             <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1"
-                                style="width: 80px; accent-color: var(--clr-primary);">
+                                class="volume-slider-styled">
                         </div>
-                        <button id="btn-loop-toggle" class="btn btn-icon" title="ループ再生 (オン/オフ)"
-                            style="color: var(--clr-text-muted);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <polyline points="17 1 21 5 17 9"></polyline>
-                                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                                <polyline points="7 23 3 19 7 15"></polyline>
-                                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-                            </svg>
-                        </button>
                     </div>
 
-                    <div class="controls-group action-controls">
-                        <!-- Undo / Redo ボタン -->
-                        <div class="history-controls"
-                            style="display: flex; gap: 0.2rem; margin-right: 0.5rem; border-right: 1px solid var(--clr-border); padding-right: 0.5rem;">
-                            <button id="btn-undo" class="btn btn-icon" title="元に戻す (Ctrl+Z)" disabled>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    <!-- 中央: 編集系 -->
+                    <div class="controls-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="button-group"
+                            style="display: flex; gap: 2px; background: var(--clr-bg-base); padding: 2px; border-radius: 8px; border: 1px solid var(--clr-border);">
+                            <button id="btn-undo" class="btn-icon-sm" title="元に戻す (Ctrl+Z)" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <path d="M3 7v6h6"></path>
                                     <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3l-3 2.7"></path>
                                 </svg>
                             </button>
-                            <button id="btn-redo" class="btn btn-icon" title="やり直す (Ctrl+Y/Ctrl+Shift+Z)" disabled>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                            <button id="btn-redo" class="btn-icon-sm" title="やり直す (Ctrl+Y/Ctrl+Shift+Z)" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
                                     <path d="M21 7v6h-6"></path>
@@ -129,7 +119,10 @@
                                 </svg>
                             </button>
                         </div>
-                        <button id="btn-split" class="btn btn-secondary" title="現在位置で区切る (Enter)">
+
+                        <div style="width: 1px; height: 24px; background: var(--clr-border); margin: 0 0.5rem;"></div>
+
+                        <button id="btn-split" class="btn-icon-action" title="現在位置で区切る (Enter / Scissors)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round">
@@ -139,100 +132,141 @@
                                 <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
                                 <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
                             </svg>
-                            区切る
                         </button>
 
-                        <div class="auto-split-controls"
-                            style="display: flex; align-items: center; gap: 0.5rem; border-left: 1px solid var(--clr-border); padding-left: 1rem; margin-left: 0.5rem;">
-                            <label title="この音量(dB)未満を無音とみなします" style="font-size: 0.8rem; color: var(--clr-text-muted);">
-                                しきい値:
-                                <input type="number" id="input-silence-thresh" value="-60" max="0" min="-100"
-                                    style="width: 60px; padding: 0.4rem; background: var(--clr-bg-card); color: white; border: 1px solid var(--clr-border); border-radius: 4px;">
-                                dB
-                            </label>
-                            <label title="この秒数以上の無音を自動カットします" style="font-size: 0.8rem; color: var(--clr-text-muted);">
-                                長さ:
-                                <input type="number" id="input-silence-duration" value="0.3" min="0.1" step="0.1"
-                                    style="width: 60px; padding: 0.4rem; background: var(--clr-bg-card); color: white; border: 1px solid var(--clr-border); border-radius: 4px;">
-                                秒
-                            </label>
-                            <button id="btn-auto-silence" class="btn btn-secondary" title="無音部分を自動検出して一括で区切り・除外します">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        <div
+                            style="display: flex; align-items: center; gap: 0.5rem; margin-left: 0.5rem; background: var(--clr-bg-base); padding: 0.25rem 0.5rem; border-radius: 8px; border: 1px solid var(--clr-border);">
+                            <button id="btn-auto-silence" class="btn-icon-action no-bg" title="無音部分を自動検出してカット">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
-                                    <path d="M12 2v20"></path>
-                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    <path d="M15 4V2" />
+                                    <path d="M15 16v-2" />
+                                    <path d="M8 9h2" />
+                                    <path d="M20 9h2" />
+                                    <path d="M17.8 11.8 19 13" />
+                                    <path d="M15 9h0" />
+                                    <path d="M17.8 6.2 19 5" />
+                                    <path d="m3 21 9-9" />
+                                    <path d="M12.2 6.2 11 5" />
                                 </svg>
-                                無音をカット
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- 処理中のオーバーレイ -->
-                    <div id="processing-overlay" class="overlay hidden">
-                        <div class="processing-content">
-                            <div class="spinner"></div>
-                            <p id="processing-status">処理中...</p>
-                            <div class="progress-bar">
-                                <div id="processing-progress" class="progress-fill" style="width: 0%"></div>
+                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                <input type="number" id="input-silence-thresh" value="-60" max="0" min="-100"
+                                    class="mini-input" title="しきい値(dB)">
+                                <span style="font-size: 0.7rem; color: var(--clr-text-muted);">dB</span>
+                                <input type="number" id="input-silence-duration" value="0.3" min="0.1" step="0.1"
+                                    class="mini-input" title="最小秒数(S)">
+                                <span style="font-size: 0.7rem; color: var(--clr-text-muted);">s</span>
                             </div>
                         </div>
                     </div>
+
+                    <!-- 右: ループ切替 -->
+                    <div style="width: 140px; display: flex; justify-content: flex-end;">
+                        <label class="switch-container" title="ループ再生 (オン/オフ)">
+                            <div class="switch-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="17 1 21 5 17 9"></polyline>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                    <polyline points="7 23 3 19 7 15"></polyline>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                                </svg>
+                            </div>
+                            <div class="switch">
+                                <input type="checkbox" id="btn-loop-toggle">
+                                <span class="slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 処理中のオーバーレイ -->
+                <div id="processing-overlay" class="overlay hidden">
+                    <div class="processing-content">
+                        <div class="spinner"></div>
+                        <p id="processing-status">処理中...</p>
+                        <div class="progress-bar">
+                            <div id="processing-progress" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- リージョン（区切り）リスト -->
             <section id="regions-section" class="card hidden">
-                <div class="section-header">
-                    <h2>区切りリスト</h2>
-                    <p class="help-text">※除外したい区間は波形上で右クリックするか、リストのトグルで切り替えられます</p>
+                <div class="section-header" style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <h2>区切りリスト</h2>
+                        <div class="project-actions" style="display: flex; gap: 0.25rem; align-items: center;">
+                            <input type="file" id="project-input" accept=".json" hidden>
+                            <button id="btn-load-project" class="btn-icon-styled" title="プロジェクト読込 (JSON)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </button>
+                            <button id="btn-save-project" class="btn-icon-styled" title="プロジェクト保存 (JSON)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="list-actions"
-                    style="margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center; justify-content: space-between;">
+                    style="margin: 2rem 0 1rem; display: flex; align-items: center; justify-content: space-between; background: var(--clr-bg-card); padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--clr-border);">
+
+                    <!-- 左: 手動追加 -->
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <label for="input-split-time" style="font-size: 0.875rem; font-weight: 500;">時刻指定追加:</label>
-                        <input type="number" id="input-split-time" class="number-input"
-                            style="width: 120px; padding: 0.5rem; border: 1px solid var(--clr-border, #ccc); border-radius: 4px;"
-                            min="0" step="0.001" placeholder="0.000">
-                        <button id="btn-add-split" class="btn btn-secondary" style="padding: 0.4rem 1rem;">追加</button>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <input type="number" id="input-split-time" class="mini-input"
+                            style="width: 80px; font-size: 1rem; border-bottom-width: 2px;" min="0" step="0.001"
+                            placeholder="0.000">
+                        <button id="btn-add-split" class="btn-icon-action" title="指定した時刻に区切り線を追加">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
                     </div>
 
-                    <div class="project-actions"
-                        style="display: flex; gap: 0.5rem; align-items: center; border-left: 1px solid var(--clr-border); border-right: 1px solid var(--clr-border); padding: 0 1rem; margin: 0 auto;">
-                        <input type="file" id="project-input" accept=".json" hidden>
-                        <button id="btn-load-project" class="btn btn-secondary" style="padding: 0.4rem 1rem;"
-                            title="保存した区切り情報のJSONを読み込みます">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    <!-- 中央: 余白 -->
+                    <div style="flex: 1;"></div>
+
+                    <!-- 右: 書き出し -->
+                    <div class="format-selector" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <select id="export-format" class="select-input"
+                            style="padding: 0.3rem 0.6rem; font-weight: bold; border-radius: 6px;">
+                            <option value="wav">WAV</option>
+                            <option value="mp3">MP3</option>
+                        </select>
+                        <button id="btn-download-all" class="btn-icon-action"
+                            style="padding: 0.5rem 1rem; border-radius: 8px; display: flex; align-items: center; justify-content: center;"
+                            disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+                                stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
                             </svg>
-                            読込
-                        </button>
-                        <button id="btn-save-project" class="btn btn-secondary" style="padding: 0.4rem 1rem;"
-                            title="現在の区切り情報をJSONファイルに保存します">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                <polyline points="7 3 7 8 15 8"></polyline>
-                            </svg>
-                            保存
-                        </button>
-                    </div>
-
-                    <div class="format-selector" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label for="export-format" style="font-size: 0.875rem; font-weight: 500;">出力形式:</label>
-                        <select id="export-format" class="select-input"
-                            style="padding: 0.4rem; border-radius: 4px; border: 1px solid var(--clr-border);">
-                            <option value="wav">WAV</option>
-                            <option value="mp3">MP3</option>
-                        </select>
-                        <button id="btn-download-all" class="btn btn-primary" style="padding: 0.4rem 1rem;" disabled>
-                            一括保存
                         </button>
                     </div>
                 </div>
