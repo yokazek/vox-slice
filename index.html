@@ -13,7 +13,49 @@
 <body>
     <div class="app-container">
         <header class="app-header">
-            <h1>VoiceSlicer</h1>
+            <div class="header-left">
+                <h1 id="app-title" style="cursor: pointer;" title="トップに戻る">VoiceSlicer</h1>
+                <div id="file-info-group">
+                    <h2 id="file-name-display">ファイル名未設定</h2>
+                    <button id="btn-reset" class="btn-icon-sm" title="ファイルを閉じて戻る"
+                        style="color: var(--clr-danger); border: 1px solid var(--clr-border); background: transparent; margin-left: 0.25rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="header-right" style="display: flex; align-items: center; gap: 1.5rem;">
+                <div id="header-time-display" class="time-display" style="display: none;">
+                    <span id="current-time">00:00.000</span> / <span id="total-time">00:00.000</span>
+                </div>
+                <div class="legend-container">
+                    <button class="btn btn-icon legend-toggle" title="操作のヒント">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span>操作方法</span>
+                    </button>
+                    <div class="legend-tooltip">
+                        <ul>
+                            <li><b>スペースキー:</b> 再生 / 一時停止</li>
+                            <li><b>Enterキー:</b> シークバーの位置で区切る</li>
+                            <li><b>Ctrl + Z / Y:</b> 元に戻す / やり直し</li>
+                            <li><b>矢印キー / Tab:</b> 前後の区切りへ移動</li>
+                            <li><b>ダブルクリック:</b> 波形上で直接区切り線を追加</li>
+                            <li><b>線を枠外へドラッグ:</b> 区切り線の削除</li>
+                            <li><b>右クリック:</b> 区間の有効 / 除外を切り替え</li>
+                            <li><b>ホイール回転:</b> 波形のズーム拡大 / 縮小</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main class="main-content">
@@ -35,38 +77,8 @@
 
             <!-- ワークスペース (ファイルアップロード後に表示) -->
             <section id="workspace" class="card hidden">
-                <div class="workspace-header">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <h2 id="file-name-display">ファイル名未設定</h2>
-                        <div class="legend-container">
-                            <button class="btn btn-icon legend-toggle" title="操作のヒント">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                                <span>操作方法</span>
-                            </button>
-                            <div class="legend-tooltip">
-                                <ul>
-                                    <li><b>スペースキー:</b> 再生 / 一時停止</li>
-                                    <li><b>Enterキー:</b> シークバーの位置で区切る</li>
-                                    <li><b>Ctrl + Z / Y:</b> 元に戻す / やり直し</li>
-                                    <li><b>矢印キー / Tab:</b> 前後の区切りへ移動</li>
-                                    <li><b>ダブルクリック:</b> 波形上で直接区切り線を追加</li>
-                                    <li><b>線を枠外へドラッグ:</b> 区切り線の削除</li>
-                                    <li><b>右クリック:</b> 区間の有効 / 除外を切り替え</li>
-                                    <li><b>ホイール回転:</b> 波形のズーム拡大 / 縮小</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="time-display">
-                        <span id="current-time">00:00.000</span> / <span id="total-time">00:00.000</span>
-                    </div>
-                </div>
+                <!-- ワークスペース固有のヘッダーはグローバルヘッダーに統合されました -->
+
 
                 <!-- 波形表示エリア -->
                 <div class="waveform-container" id="waveform-container">
@@ -279,8 +291,7 @@
                                 <th>開始時間 (sec)</th>
                                 <th>終了時間 (sec)</th>
                                 <th>長さ (sec)</th>
-                                <th>状態</th>
-                                <th>操作</th>
+                                <th style="text-align: right;">操作</th>
                             </tr>
                         </thead>
                         <tbody id="regions-list">

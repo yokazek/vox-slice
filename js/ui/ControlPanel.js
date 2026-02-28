@@ -14,6 +14,7 @@ export default class ControlPanel {
         // 再生コントロール関連
         this.currentTimeDisplay = document.getElementById('current-time');
         this.totalTimeDisplay = document.getElementById('total-time');
+        this.headerTimeDisplay = document.getElementById('header-time-display');
         this.btnLoopToggle = document.getElementById('btn-loop-toggle');
 
         // アクション・履歴関連
@@ -40,6 +41,10 @@ export default class ControlPanel {
         this.processingOverlay = document.getElementById('processing-overlay');
         this.processingStatus = document.getElementById('processing-status');
         this.processingProgress = document.getElementById('processing-progress');
+
+        // リセット / タイトル
+        this.btnReset = document.getElementById('btn-reset');
+        this.appTitle = document.getElementById('app-title');
 
         // 外部に通知するイベントコールバック群
         this.onFileSelected = null;       // (file)
@@ -155,7 +160,7 @@ export default class ControlPanel {
             });
         }
 
-        // --- 3. エクスポート関連 ---
+        // --- エクスポート関連 ---
         if (this.btnDownloadAll) {
             this.btnDownloadAll.addEventListener('click', () => {
                 if (this.onDownloadClick) {
@@ -163,6 +168,24 @@ export default class ControlPanel {
                     this.onDownloadClick(format);
                 }
             });
+        }
+
+        // --- リセット処理 (ページリロード) ---
+        const handleReload = () => {
+            if (!this.workspace.classList.contains('hidden')) {
+                if (confirm('現在の作業内容は消去されます。よろしいですか？')) {
+                    window.location.reload();
+                }
+            } else {
+                window.location.reload();
+            }
+        };
+
+        if (this.btnReset) {
+            this.btnReset.addEventListener('click', handleReload);
+        }
+        if (this.appTitle) {
+            this.appTitle.addEventListener('click', handleReload);
         }
 
         // --- 4. キーボードショートカット ---
@@ -229,6 +252,11 @@ export default class ControlPanel {
         // アップロードUIを隠してワークスペースを表示
         this.dropZone.classList.add('hidden');
         this.workspace.classList.remove('hidden');
+
+        // ヘッダーのアニメーションと時間表示の有効化
+        const container = document.querySelector('.app-container');
+        if (container) container.classList.add('workspace-active');
+        if (this.headerTimeDisplay) this.headerTimeDisplay.style.display = 'flex';
 
         if (this.onFileSelected) {
             this.onFileSelected(file);
